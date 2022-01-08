@@ -16,11 +16,35 @@
 
 package nl.knaw.dans.wf.nbnlink;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
+import nl.knaw.dans.lib.util.DataverseClientFactory;
+import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 public class DdWorkflowStepAddNbnLinkConfiguration extends Configuration {
+    @NotNull
+    @Valid
+    private DataverseClientFactory dataverse;
 
+    @NotNull
+    @Valid
+    private ExecutorServiceFactory taskQueue;
+
+    public DataverseClientFactory getDataverse() {
+        return dataverse;
+    }
+
+    public void setDataverse(DataverseClientFactory dataverse) {
+        this.dataverse = dataverse;
+    }
+
+    public void setTaskQueue(ExecutorServiceFactory taskExecutorThreadPool) {
+        this.taskQueue = taskExecutorThreadPool;
+    }
+
+    public ExecutorServiceFactory getTaskQueue() {
+        return taskQueue;
+    }
 }
