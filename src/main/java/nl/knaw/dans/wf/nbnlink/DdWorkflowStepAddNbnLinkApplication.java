@@ -22,10 +22,13 @@ import io.dropwizard.setup.Environment;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.wf.nbnlink.resources.StepInvocationResource;
 import nl.knaw.dans.wf.nbnlink.resources.StepRollbackResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 
 public class DdWorkflowStepAddNbnLinkApplication extends Application<DdWorkflowStepAddNbnLinkConfiguration> {
+    private static final Logger log = LoggerFactory.getLogger(DdWorkflowStepAddNbnLinkApplication.class);
 
     public static void main(final String[] args) throws Exception {
         new DdWorkflowStepAddNbnLinkApplication().run(args);
@@ -42,6 +45,7 @@ public class DdWorkflowStepAddNbnLinkApplication extends Application<DdWorkflowS
 
     @Override
     public void run(final DdWorkflowStepAddNbnLinkConfiguration configuration, final Environment environment) {
+        log.trace("run");
         final ExecutorService executorService = configuration.getTaskQueue().build(environment);
         DataverseClient client = configuration.getDataverse().build();
         environment.jersey().register(new StepInvocationResource(executorService, client));
