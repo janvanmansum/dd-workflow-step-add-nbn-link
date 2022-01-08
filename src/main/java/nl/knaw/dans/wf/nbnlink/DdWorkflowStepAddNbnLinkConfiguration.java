@@ -32,6 +32,10 @@ public class DdWorkflowStepAddNbnLinkConfiguration extends Configuration {
     @Valid
     private ExecutorServiceFactory taskQueue;
 
+    @NotNull
+    @Valid
+    private ResumerFactory resume;
+
     public DataverseClientFactory getDataverse() {
         return dataverse;
     }
@@ -46,5 +50,13 @@ public class DdWorkflowStepAddNbnLinkConfiguration extends Configuration {
 
     public ExecutorServiceFactory getTaskQueue() {
         return taskQueue;
+    }
+
+    public ResumerFactory getResume() {
+        return resume;
+    }
+
+    public void setResume(ResumerFactory resume) {
+        this.resume = resume;
     }
 }

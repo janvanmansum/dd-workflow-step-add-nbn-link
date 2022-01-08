@@ -18,6 +18,7 @@ package nl.knaw.dans.wf.nbnlink.resources;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.wf.nbnlink.api.StepInvocation;
 import nl.knaw.dans.wf.nbnlink.core.AddNbnLinkTask;
+import nl.knaw.dans.wf.nbnlink.core.Resumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,18 +36,20 @@ public class StepInvocationResource {
 
     private static final Logger log = LoggerFactory.getLogger(StepInvocationResource.class);
 
-    private final Executor executor;
+    private final Executor taskExecutor;
+    private final Resumer resumer;
     private final DataverseClient dataverseClient;
 
-    public StepInvocationResource(Executor executor, DataverseClient dataverseClient) {
-        this.executor = executor;
+    public StepInvocationResource(Executor taskExecutor, Resumer resumer, DataverseClient dataverseClient) {
+        this.taskExecutor = taskExecutor;
+        this.resumer = resumer;
         this.dataverseClient = dataverseClient;
     }
 
     @POST
     public void run(@Valid StepInvocation inv) throws IOException {
         log.info("Received invocation: {}", inv);
-        executor.execute(new AddNbnLinkTask(inv, dataverseClient));
+        taskExecutor.execute(new AddNbnLinkTask(inv, dataverseClient, resumer));
         log.info("Added new task to queue");
     }
 

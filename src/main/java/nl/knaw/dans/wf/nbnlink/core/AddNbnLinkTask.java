@@ -16,23 +16,21 @@
 package nl.knaw.dans.wf.nbnlink.core;
 
 import nl.knaw.dans.lib.dataverse.DataverseClient;
-import nl.knaw.dans.lib.dataverse.DataverseException;
-import nl.knaw.dans.lib.dataverse.model.workflow.ResumeMessage;
 import nl.knaw.dans.wf.nbnlink.api.StepInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class AddNbnLinkTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(AddNbnLinkTask.class);
 
     private final StepInvocation stepInvocation;
     private final DataverseClient dataverseClient;
+    private final Resumer resumer;
 
-    public AddNbnLinkTask(StepInvocation stepInvocation, DataverseClient dataverseClient) {
+    public AddNbnLinkTask(StepInvocation stepInvocation, DataverseClient dataverseClient, Resumer resumer) {
         this.stepInvocation = stepInvocation;
         this.dataverseClient = dataverseClient;
+        this.resumer = resumer;
     }
 
     @Override
@@ -52,14 +50,7 @@ public class AddNbnLinkTask implements Runnable {
             4. Build a persistent identifier link
             5. Add a new description element based on the template and the persistent identifier link
         */
-        resume();
-    }
-
-    private void resume() {
-        try {
-            dataverseClient.workflows().resume(stepInvocation.getInvocationId(), new ResumeMessage("Success", "", ""));
-        } catch (IOException| DataverseException e) {
-            log.error("Failed to resume after invocation {}", stepInvocation.getInvocationId(), e);
-        }
+        resumer.executeResume(stepInvocation.getInvocationId(), dataverseClient);
+        log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
     }
 }
