@@ -20,6 +20,7 @@ import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.DataverseResponse;
+import nl.knaw.dans.lib.dataverse.model.dataset.CompoundField;
 import nl.knaw.dans.lib.dataverse.model.dataset.DatasetVersion;
 import nl.knaw.dans.lib.dataverse.model.dataset.FieldList;
 import nl.knaw.dans.lib.dataverse.model.dataset.MetadataBlock;
@@ -38,11 +39,13 @@ public class AddNbnLinkTask implements Runnable {
 
     private final StepInvocation stepInvocation;
     private final DataverseClient dataverseClient;
+    private final NbnLinkCreator nbnLinkCreator;
     private final Resumer resumer;
 
-    public AddNbnLinkTask(StepInvocation stepInvocation, DataverseClient dataverseClient, Resumer resumer) {
+    public AddNbnLinkTask(StepInvocation stepInvocation, DataverseClient dataverseClient, NbnLinkCreator nbnLinkCreator, Resumer resumer) {
         this.stepInvocation = stepInvocation;
         this.dataverseClient = dataverseClient;
+        this.nbnLinkCreator = nbnLinkCreator;
         this.resumer = resumer;
     }
 
@@ -59,18 +62,22 @@ public class AddNbnLinkTask implements Runnable {
         DatasetApi datasetApi = dataverseClient.dataset(stepInvocation.getGlobalId(), stepInvocation.getInvocationId());
         Map<String, MetadataBlock> metadata = getMetadata(datasetApi);
 
+        /*
+         * Even though it seems Dataverse will not add multiple descriptions that are exactly equal, we check if the NBN link
+         * is already present. If so, we take the cautious road and skip adding it.
+         */
+        if (isLinkAlreadyAdded(metadata.get("citation"), nbnLinkCreator.getMarker())) {
+            log.debug("NBN link already present, skipping");
+            return;
+        }
+
         MetadataBlock vaultMetadata = metadata.get("dansDataVaultMetadata");
         if (vaultMetadata == null) {
             throw new IllegalStateException("No vault metadata set in dataset" + stepInvocation.getGlobalId());
         }
         String nbn = getNbn(vaultMetadata);
-        /*  TODO:
-            3. Remove any description element with the marker in it
-            4. Build a persistent identifier link
-            5. Add a new description element based on the template and the persistent identifier link
-        */
         log.debug("Found nbn = {}", nbn);
-        addNbnToMetadata(datasetApi, nbn);
+        addNbnToMetadata(datasetApi, nbnLinkCreator.create(nbn));
 
         resumer.executeResume(stepInvocation.getInvocationId(), dataverseClient);
         log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
@@ -85,6 +92,18 @@ public class AddNbnLinkTask implements Runnable {
         catch (IOException | DataverseException e) {
             throw new IllegalStateException("Could not retrieve metadata for dataset " + stepInvocation.getGlobalId(), e);
         }
+    }
+
+    private boolean isLinkAlreadyAdded(MetadataBlock citationMetadata, String marker) {
+        // TODO: extract into class and add unit tests
+        return citationMetadata.getFields()
+            .stream()
+            .filter(f -> "dsDescription".equals(f.getTypeName()))
+            .map(f -> (CompoundField) f)
+            .anyMatch(cf ->
+                cf.getValue().stream().map(svf ->
+                        svf.get("dsDescriptionValue").getValue())
+                    .anyMatch(s -> s.endsWith(marker)));
     }
 
     private String getNbn(MetadataBlock vaultMetadata) {

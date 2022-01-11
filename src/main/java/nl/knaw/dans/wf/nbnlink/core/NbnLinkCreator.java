@@ -37,4 +37,8 @@ public class NbnLinkCreator {
         String link = String.format("<a href=\"%s\">%s</a>", href, nbn);
         return String.format(descriptionTemplate + marker, link);
     }
+
+    public String getMarker() {
+        return marker;
+    }
 }
