@@ -27,3 +27,40 @@ logging:
     - type: file
       archive: false
       currentLogFilename: data/dd-workflow-step-add-nbn-link.log
+
+
+#
+# Configures the threads on which the vault metadata setting actions are executed.
+#
+taskQueue:
+  nameFormat: "task-queue-thread-%d"
+
+  maxQueueSize: 4
+  # Number of threads will be increased when maxQueueSize is exceeded.
+  minThreads: 2
+  # No more than maxThreads will be created though
+  maxThreads: 10
+  # Threads will die after 60 seconds of idleness
+  keepAliveTime: 60 seconds
+
+resume:
+  resumeQueue:
+    nameFormat: "resume-queue-thread-%d"
+
+    maxQueueSize: 4
+    # Number of threads will be increased when maxQueueSize is exceeded.
+    minThreads: 2
+    # No more than maxThreads will be created though
+    maxThreads: 10
+    # Threads will die after 60 seconds of idleness
+    keepAliveTime: 60 seconds
+
+  retryPolicy:
+    maxTries: 5
+    timeBetweenTries: 2 seconds
+
+dataverse:
+  baseUrl: 'http://dar.dans.knaw.nl:8080/'
+  apiKey: changeme
+  awaitLockStateMaxNumberOfRetries: 5
+  awaitLockStateMillisecondsBetweenRetries: 3000
