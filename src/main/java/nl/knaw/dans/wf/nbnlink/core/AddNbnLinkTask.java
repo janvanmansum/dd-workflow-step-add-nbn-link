@@ -15,10 +15,13 @@
  */
 package nl.knaw.dans.wf.nbnlink.core;
 
+import nl.knaw.dans.lib.dataverse.CompoundFieldBuilder;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.DataverseResponse;
 import nl.knaw.dans.lib.dataverse.model.dataset.DatasetVersion;
+import nl.knaw.dans.lib.dataverse.model.dataset.FieldList;
 import nl.knaw.dans.lib.dataverse.model.dataset.MetadataBlock;
 import nl.knaw.dans.lib.dataverse.model.dataset.PrimitiveSingleValueField;
 import nl.knaw.dans.wf.nbnlink.api.StepInvocation;
@@ -46,14 +49,15 @@ public class AddNbnLinkTask implements Runnable {
     @Override
     public String toString() {
         return "AddNbnLinkTask{" +
-                "stepInvocation=" + stepInvocation +
-                '}';
+            "stepInvocation=" + stepInvocation +
+            '}';
     }
 
     @Override
     public void run() {
         log.trace("run");
-        Map<String, MetadataBlock> metadata = getMetadata();
+        DatasetApi datasetApi = dataverseClient.dataset(stepInvocation.getGlobalId(), stepInvocation.getInvocationId());
+        Map<String, MetadataBlock> metadata = getMetadata(datasetApi);
 
         MetadataBlock vaultMetadata = metadata.get("dansDataVaultMetadata");
         if (vaultMetadata == null) {
@@ -65,31 +69,30 @@ public class AddNbnLinkTask implements Runnable {
             4. Build a persistent identifier link
             5. Add a new description element based on the template and the persistent identifier link
         */
-
         log.debug("Found nbn = {}", nbn);
-
+        addNbnToMetadata(datasetApi, nbn);
 
         resumer.executeResume(stepInvocation.getInvocationId(), dataverseClient);
         log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
     }
 
-    private Map<String, MetadataBlock> getMetadata() {
+    private Map<String, MetadataBlock> getMetadata(DatasetApi datasetApi) {
         try {
-            DataverseResponse<DatasetVersion> r = dataverseClient.dataset(stepInvocation.getGlobalId()).getVersion(":draft");
+            DataverseResponse<DatasetVersion> r = datasetApi.getVersion(":draft");
             return r.getData().getMetadataBlocks();
-        } catch (IOException | DataverseException e) {
+        }
+        catch (IOException | DataverseException e) {
             throw new IllegalStateException("Could not retrieve metadata for dataset " + stepInvocation.getGlobalId(), e);
         }
-
     }
 
     private String getNbn(MetadataBlock vaultMetadata) {
         List<String> nbns = vaultMetadata.getFields()
-                .stream()
-                .filter(f -> "dansNbn".equals(f.getTypeName()))
-                .map(f -> (PrimitiveSingleValueField) f)
-                .map(PrimitiveSingleValueField::getValue)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(f -> "dansNbn".equals(f.getTypeName()))
+            .map(f -> (PrimitiveSingleValueField) f)
+            .map(PrimitiveSingleValueField::getValue)
+            .collect(Collectors.toList());
         if (nbns.isEmpty())
             throw new IllegalStateException("Cannot find NBN for dataset " + stepInvocation.getGlobalId());
         if (nbns.size() > 1)
@@ -97,5 +100,23 @@ public class AddNbnLinkTask implements Runnable {
         return nbns.get(0);
     }
 
+    private void addNbnToMetadata(DatasetApi datasetApi, String nbn) {
+        FieldList fieldList = createNbnLinkDescription(nbn);
+        try {
+            datasetApi.editMetadata(fieldList, false);
+        }
+        catch (IOException | DataverseException e) {
+            throw new IllegalStateException("Could not updated metadata with NBN link description for dataset " + stepInvocation.getGlobalId(), e);
+        }
+    }
+
+    private FieldList createNbnLinkDescription(String nbn) {
+        FieldList fieldList = new FieldList();
+        fieldList.add(new CompoundFieldBuilder("dsDescription", true)
+            .addSubfield("dsDescriptionValue", nbn)
+            .addSubfield("dsDescriptionDate", "")
+            .build());
+        return fieldList;
+    }
 
 }
