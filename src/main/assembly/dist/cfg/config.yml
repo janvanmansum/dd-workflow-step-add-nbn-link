@@ -60,3 +60,9 @@ dataverse:
   baseUrl: 'http://localhost:8080/'
   awaitLockStateMaxNumberOfRetries: 5
   awaitLockStateMillisecondsBetweenRetries: 3000
+
+nbnLink:
+  baseUrl: 'http://www.persistent-identifier.nl?identifier='
+  marker: '<input type="hidden" value="NBN"></input>'
+  descriptionTemplate:  'A copy of this dataset is stored in EASY, the DANS CTS certified repository, at %s'
+

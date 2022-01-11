@@ -19,6 +19,7 @@ package nl.knaw.dans.wf.nbnlink;
 import io.dropwizard.Configuration;
 import nl.knaw.dans.lib.util.DataverseClientFactory;
 import nl.knaw.dans.lib.util.ExecutorServiceFactory;
+import nl.knaw.dans.wf.nbnlink.core.NbnLinkCreator;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,6 +36,10 @@ public class DdWorkflowStepAddNbnLinkConfiguration extends Configuration {
     @NotNull
     @Valid
     private ResumerFactory resume;
+
+    @NotNull
+    @Valid
+    private NbnLinkCreatorFactory nbnLink;
 
     public DataverseClientFactory getDataverse() {
         return dataverse;
@@ -58,5 +63,13 @@ public class DdWorkflowStepAddNbnLinkConfiguration extends Configuration {
 
     public void setResume(ResumerFactory resume) {
         this.resume = resume;
+    }
+
+    public NbnLinkCreatorFactory getNbnLink() {
+        return nbnLink;
+    }
+
+    public void setNbnLink(NbnLinkCreatorFactory nbnLink) {
+        this.nbnLink = nbnLink;
     }
 }

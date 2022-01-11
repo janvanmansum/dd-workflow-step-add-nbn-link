@@ -74,6 +74,7 @@ public class AddNbnLinkTask implements Runnable {
 
         resumer.executeResume(stepInvocation.getInvocationId(), dataverseClient);
         log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
+        // TODO: let workflow fail if link cannot be added?
     }
 
     private Map<String, MetadataBlock> getMetadata(DatasetApi datasetApi) {
