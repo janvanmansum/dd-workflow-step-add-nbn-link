@@ -1,8 +1,7 @@
 dd-workflow-step-add-nbn-link
-===========
+=============================
 
-<!-- Remove this comment and extend the descriptions below -->
-
+Adds a link to the dataset mirrored in EASY, by means of the NBN.
 
 SYNOPSIS
 --------
@@ -12,8 +11,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-
-Adds a link to the dataset mirrored in EASY
+Adds a link to the dataset mirrored in EASY, by means of the NBN. 
 
 
 ARGUMENTS
@@ -25,12 +23,6 @@ ARGUMENTS
         named arguments:
         -h, --help             show this help message and exit
         -v, --version          show the application version and exit
-
-EXAMPLES
---------
-
-<!-- Add examples of invoking this module from the command line or via HTTP other interfaces -->
-    
 
 INSTALLATION AND CONFIGURATION
 ------------------------------
