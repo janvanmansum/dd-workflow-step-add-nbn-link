@@ -28,19 +28,30 @@ import java.util.concurrent.Executor;
 
 import static java.lang.Thread.sleep;
 
-// TODO: MOVE TO dans-java-utils
+// TODO: MOVE TO dans-java-utils or dans-dataverse-client-libs
 public class Resumer {
     private static final Logger log = LoggerFactory.getLogger(Resumer.class);
 
+    enum Status {
+        Success,
+        Failure
+    };
+
+    private final DataverseClient dataverseClient;
     private final RetryPolicy retryPolicy;
     private final Executor resumeExecutor;
 
-    public Resumer(RetryPolicy retryPolicy, Executor resumeExecutor) {
+    public Resumer(DataverseClient dataverseClient, RetryPolicy retryPolicy, Executor resumeExecutor) {
+        this.dataverseClient = dataverseClient;
         this.retryPolicy = retryPolicy;
         this.resumeExecutor = resumeExecutor;
     }
 
-    public void executeResume(String invocationId, final DataverseClient dataverseClient) {
+    public void executeResume(String invocationId, Status status) {
+        executeResume(invocationId, status, "", "");
+    }
+
+    public void executeResume(String invocationId, Status status, String reason, String message) {
         resumeExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -65,7 +76,7 @@ public class Resumer {
 
             private boolean tryResume() {
                 try {
-                    dataverseClient.workflows().resume(invocationId, new ResumeMessage("Success", "", ""));
+                    dataverseClient.workflows().resume(invocationId, new ResumeMessage(status.name(), reason, message));
                     return true;
                 } catch (DataverseException e) {
                     if (e.getStatus() == HttpStatus.SC_NOT_FOUND) return false;

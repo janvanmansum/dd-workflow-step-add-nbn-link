@@ -1,0 +1,202 @@
+{
+  "status": "OK",
+  "data": [
+    {
+      "id": 9,
+      "datasetId": 43,
+      "datasetPersistentId": "doi:10.5072/DAR/49MVIA",
+      "storageIdentifier": "file://10.5072/DAR/49MVIA",
+      "versionNumber": 1,
+      "versionMinorNumber": 0,
+      "versionState": "RELEASED",
+      "lastUpdateTime": "2022-01-12T15:02:41Z",
+      "releaseTime": "2022-01-12T15:02:41Z",
+      "createTime": "2022-01-12T15:02:01Z",
+      "license": {
+        "label": "CC-BY-4.0",
+        "uri": "http://creativecommons.org/licenses/by/4.0"
+      },
+      "fileAccessRequest": false,
+      "metadataBlocks": {
+        "citation": {
+          "displayName": "Citation Metadata",
+          "name": "citation",
+          "fields": [
+            {
+              "typeName": "title",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Test 2"
+            },
+            {
+              "typeName": "author",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "authorName": {
+                    "typeName": "authorName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Admin, Dataverse"
+                  },
+                  "authorAffiliation": {
+                    "typeName": "authorAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Dataverse.org"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "datasetContact",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "datasetContactName": {
+                    "typeName": "datasetContactName",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Admin, Dataverse"
+                  },
+                  "datasetContactAffiliation": {
+                    "typeName": "datasetContactAffiliation",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Dataverse.org"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "dsDescription",
+              "multiple": true,
+              "typeClass": "compound",
+              "value": [
+                {
+                  "dsDescriptionValue": {
+                    "typeName": "dsDescriptionValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "Test"
+                  }
+                },
+                {
+                  "dsDescriptionValue": {
+                    "typeName": "dsDescriptionValue",
+                    "multiple": false,
+                    "typeClass": "primitive",
+                    "value": "A copy of this dataset is stored in EASY, the DANS CTS certified repository, at <a href=\"http://www.persistent-identifier.nl?identifier=urn:nbn:nl:ui:13-14b25f5c-5e9d-42a3-b9ba-4ba0d63978db\">urn:nbn:nl:ui:13-14b25f5c-5e9d-42a3-b9ba-4ba0d63978db</a><input type=\"hidden\" value=\"NBN\"></input>"
+                  }
+                }
+              ]
+            },
+            {
+              "typeName": "subject",
+              "multiple": true,
+              "typeClass": "controlledVocabulary",
+              "value": [
+                "Agricultural Sciences"
+              ]
+            },
+            {
+              "typeName": "depositor",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "Admin, Dataverse"
+            },
+            {
+              "typeName": "dateOfDeposit",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "2022-01-12"
+            }
+          ]
+        },
+        "dansRights": {
+          "displayName": "Rights Metadata",
+          "name": "dansRights",
+          "fields": [
+            {
+              "typeName": "dansRightsHolder",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "DANs"
+              ]
+            },
+            {
+              "typeName": "dansPersonalDataPresent",
+              "multiple": false,
+              "typeClass": "controlledVocabulary",
+              "value": "Unknown"
+            }
+          ]
+        },
+        "dansRelationMetadata": {
+          "displayName": "Relation Metadata",
+          "name": "dansRelationMetadata",
+          "fields": [
+            {
+              "typeName": "dansAudience",
+              "multiple": true,
+              "typeClass": "primitive",
+              "value": [
+                "https://www.narcis.nl/classification/D18210"
+              ],
+              "expandedvalue": [
+                {
+                  "@id": "https://www.narcis.nl/classification/D18210",
+                  "termName": [
+                    {
+                      "lang": "en",
+                      "value": "Agriculture and horticulture"
+                    },
+                    {
+                      "lang": "nl",
+                      "value": "Landbouw en tuinbouw"
+                    }
+                  ],
+                  "vocabularyUri": "https://www.narcis.nl/classification/"
+                }
+              ]
+            }
+          ]
+        },
+        "dansDataVaultMetadata": {
+          "displayName": "Data Vault Metadata",
+          "name": "dansDataVaultMetadata",
+          "fields": [
+            {
+              "typeName": "dansDataversePid",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "doi:10.5072/DAR/49MVIA"
+            },
+            {
+              "typeName": "dansDataversePidVersion",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "1.0"
+            },
+            {
+              "typeName": "dansBagId",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "urn:uuid:9e6a308d-7f09-4d6c-8bdc-b2037ce87a13"
+            },
+            {
+              "typeName": "dansNbn",
+              "multiple": false,
+              "typeClass": "primitive",
+              "value": "urn:nbn:nl:ui:13-14b25f5c-5e9d-42a3-b9ba-4ba0d63978db"
+            }
+          ]
+        }
+      },
+      "files": []
+    }
+  ]
+}
