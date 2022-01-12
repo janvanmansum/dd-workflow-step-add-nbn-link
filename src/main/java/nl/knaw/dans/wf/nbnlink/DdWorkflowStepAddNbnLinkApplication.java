@@ -50,8 +50,8 @@ public class DdWorkflowStepAddNbnLinkApplication extends Application<DdWorkflowS
         log.trace("run");
         final ExecutorService taskExecutor = configuration.getTaskQueue().build(environment);
         final NbnLinkCreator nbnLinkCreator = configuration.getNbnLink().build();
-        final Resumer resumer = configuration.getResume().build(environment);
         DataverseClient client = configuration.getDataverse().build();
+        final Resumer resumer = configuration.getResume().build(client, environment);
         environment.jersey().register(new StepInvocationResource(taskExecutor, nbnLinkCreator, resumer, client));
         environment.jersey().register(new StepRollbackResource(taskExecutor, client));
     }

@@ -16,6 +16,7 @@
 package nl.knaw.dans.wf.nbnlink;
 
 import io.dropwizard.setup.Environment;
+import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 import nl.knaw.dans.wf.nbnlink.core.Resumer;
 
@@ -23,8 +24,8 @@ public class ResumerFactory {
     private RetryPolicy retryPolicy;
     private ExecutorServiceFactory resumeQueue;
 
-    public Resumer build(Environment environment) {
-        return new Resumer(retryPolicy, resumeQueue.build(environment));
+    public Resumer build(DataverseClient dataverseClient, Environment environment) {
+        return new Resumer(dataverseClient, retryPolicy, resumeQueue.build(environment));
     }
 
     public RetryPolicy getRetryPolicy() {

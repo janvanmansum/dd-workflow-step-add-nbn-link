@@ -20,7 +20,6 @@ import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.DataverseResponse;
-import nl.knaw.dans.lib.dataverse.model.dataset.CompoundField;
 import nl.knaw.dans.lib.dataverse.model.dataset.DatasetVersion;
 import nl.knaw.dans.lib.dataverse.model.dataset.FieldList;
 import nl.knaw.dans.lib.dataverse.model.dataset.MetadataBlock;
@@ -31,11 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AddNbnLinkTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(AddNbnLinkTask.class);
+    private static final String BLOCK_NAME_DATAVAULT_METADATA = "dansDataVaultMetadata";
 
     private final StepInvocation stepInvocation;
     private final DataverseClient dataverseClient;
@@ -59,51 +58,52 @@ public class AddNbnLinkTask implements Runnable {
     @Override
     public void run() {
         log.trace("run");
-        DatasetApi datasetApi = dataverseClient.dataset(stepInvocation.getGlobalId(), stepInvocation.getInvocationId());
-        Map<String, MetadataBlock> metadata = getMetadata(datasetApi);
+        try {
+            DatasetApi datasetApi = dataverseClient.dataset(stepInvocation.getGlobalId(), stepInvocation.getInvocationId());
+            DataverseResponse<DatasetVersion> draft = getDraftVersion(datasetApi);
 
-        /*
-         * Even though it seems Dataverse will not add multiple descriptions that are exactly equal, we check if the NBN link
-         * is already present. If so, we take the cautious road and skip adding it.
-         */
-        if (isLinkAlreadyAdded(metadata.get("citation"), nbnLinkCreator.getMarker())) {
-            log.debug("NBN link already present, skipping");
-            return;
+            /*
+             * Even though it seems Dataverse will not add multiple descriptions that are exactly equal, we check if the NBN link
+             * is already present. If so, we take the cautious road and skip adding it.
+             */
+            if (new NbnLinkFinder(draft.getEnvelopeAsString(), nbnLinkCreator.getMarker()).isNbnLinkAdded()) {
+                log.debug("NBN link already present, skipping");
+            }
+            else {
+                MetadataBlock vaultMetadata = getVaultMetadata(draft);
+                if (vaultMetadata == null) {
+                    throw new IllegalStateException("No vault metadata set in dataset" + stepInvocation.getGlobalId());
+                }
+                String nbn = getNbn(vaultMetadata);
+                log.debug("Found nbn = {}", nbn);
+                FieldList fieldList = createNbnLinkDescription(nbn);
+                datasetApi.editMetadata(fieldList, false);
+            }
+            resumer.executeResume(stepInvocation.getInvocationId(), Resumer.Status.Success);
+            log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
         }
-
-        MetadataBlock vaultMetadata = metadata.get("dansDataVaultMetadata");
-        if (vaultMetadata == null) {
-            throw new IllegalStateException("No vault metadata set in dataset" + stepInvocation.getGlobalId());
+        catch (DataverseException | IOException | IllegalStateException e) {
+            log.warn("Could not add NBN link. Failing PrePublishDataset Workflow", e);
+            resumer.executeResume(stepInvocation.getInvocationId(), Resumer.Status.Failure, "Could not add NBN link", "Pre-publication workflow returned an error");
         }
-        String nbn = getNbn(vaultMetadata);
-        log.debug("Found nbn = {}", nbn);
-        addNbnToMetadata(datasetApi, nbnLinkCreator.create(nbn));
-
-        resumer.executeResume(stepInvocation.getInvocationId(), dataverseClient);
-        log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
-        // TODO: let workflow fail if link cannot be added?
     }
 
-    private Map<String, MetadataBlock> getMetadata(DatasetApi datasetApi) {
+    private DataverseResponse<DatasetVersion> getDraftVersion(DatasetApi datasetApi) {
         try {
-            DataverseResponse<DatasetVersion> r = datasetApi.getVersion(":draft");
-            return r.getData().getMetadataBlocks();
+            return datasetApi.getVersion(":draft");
         }
         catch (IOException | DataverseException e) {
             throw new IllegalStateException("Could not retrieve metadata for dataset " + stepInvocation.getGlobalId(), e);
         }
     }
 
-    private boolean isLinkAlreadyAdded(MetadataBlock citationMetadata, String marker) {
-        // TODO: extract into class and add unit tests
-        return citationMetadata.getFields()
-            .stream()
-            .filter(f -> "dsDescription".equals(f.getTypeName()))
-            .map(f -> (CompoundField) f)
-            .anyMatch(cf ->
-                cf.getValue().stream().map(svf ->
-                        svf.get("dsDescriptionValue").getValue())
-                    .anyMatch(s -> s.endsWith(marker)));
+    private MetadataBlock getVaultMetadata(DataverseResponse<DatasetVersion> versionResponse) {
+        try {
+            return versionResponse.getData().getMetadataBlocks().get(BLOCK_NAME_DATAVAULT_METADATA);
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Could not read dataset version response");
+        }
     }
 
     private String getNbn(MetadataBlock vaultMetadata) {
@@ -120,20 +120,10 @@ public class AddNbnLinkTask implements Runnable {
         return nbns.get(0);
     }
 
-    private void addNbnToMetadata(DatasetApi datasetApi, String nbn) {
-        FieldList fieldList = createNbnLinkDescription(nbn);
-        try {
-            datasetApi.editMetadata(fieldList, false);
-        }
-        catch (IOException | DataverseException e) {
-            throw new IllegalStateException("Could not updated metadata with NBN link description for dataset " + stepInvocation.getGlobalId(), e);
-        }
-    }
-
     private FieldList createNbnLinkDescription(String nbn) {
         FieldList fieldList = new FieldList();
         fieldList.add(new CompoundFieldBuilder("dsDescription", true)
-            .addSubfield("dsDescriptionValue", nbn)
+            .addSubfield("dsDescriptionValue", nbnLinkCreator.create(nbn))
             .addSubfield("dsDescriptionDate", "")
             .build());
         return fieldList;
