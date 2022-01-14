@@ -102,7 +102,7 @@ public class AddNbnLinkTask implements Runnable {
             return versionResponse.getData().getMetadataBlocks().get(BLOCK_NAME_DATAVAULT_METADATA);
         }
         catch (IOException e) {
-            throw new IllegalStateException("Could not read dataset version response");
+            throw new IllegalStateException("Could not read dataset version response", e);
         }
     }
 
