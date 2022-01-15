@@ -29,7 +29,7 @@
     <artifactId>dd-workflow-step-add-nbn-link</artifactId>
     <version>0.0.2-SNAPSHOT</version>
 
-    <name>Dd Workflow Step Add Nbn Link</name>
+    <name>DD Workflow Step Add NBN Link</name>
     <url>https://github.com/DANS-KNAW/dd-workflow-step-add-nbn-link</url>
     <description>Adds a link to the dataset mirrored in EASY</description>
     <inceptionYear>2022</inceptionYear>
