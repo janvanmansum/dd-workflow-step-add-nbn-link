@@ -20,10 +20,10 @@ import nl.knaw.dans.wf.nbnlink.core.NbnLinkCreator;
 public class NbnLinkCreatorFactory {
 
     private String baseUrl;
-    private String descriptionTemplate;
+    private String noteTemplate;
 
     public NbnLinkCreator build() {
-        return new NbnLinkCreator(baseUrl, descriptionTemplate);
+        return new NbnLinkCreator(baseUrl, noteTemplate);
     }
 
     public String getBaseUrl() {
@@ -34,11 +34,11 @@ public class NbnLinkCreatorFactory {
         this.baseUrl = baseUrl;
     }
 
-    public String getDescriptionTemplate() {
-        return descriptionTemplate;
+    public String getNoteTemplate() {
+        return noteTemplate;
     }
 
-    public void setDescriptionTemplate(String descriptionTemplate) {
-        this.descriptionTemplate = descriptionTemplate;
+    public void setNoteTemplate(String noteTemplate) {
+        this.noteTemplate = noteTemplate;
     }
 }

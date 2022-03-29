@@ -67,9 +67,6 @@ dataverse:
 nbnLink:
   # Base URL of the NBN link. The NBN will be pasted at the end
   baseUrl: 'http://www.persistent-identifier.nl?identifier='
-  # Marker to put at the end of the description, so that the description elements kan be selected for deletion more easily.
-  marker: '<input type="hidden" value="NBN"></input>'
-  # The text for the description. Must contain one %s to indicate the place for the link in the text.
-  descriptionTemplate: A copy of this dataset is stored in EASY, the DANS CTS certified repository, at %s. (Note that this
+  noteTemplate: A copy of this dataset is stored in EASY, the DANS CTS certified repository, at %s. (Note that this
     link will become resolvable only after the mirroring process has finished, which will take up to several days after first
     publication of the dataset.)
