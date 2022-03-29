@@ -15,30 +15,22 @@
  */
 package nl.knaw.dans.wf.nbnlink.core;
 
-import java.net.URI;
-
 /**
  * Creates the description element text based on an NBN value.
  */
 public class NbnLinkCreator {
 
     private final String baseUrl;
-    private final String marker;
-    private final String descriptionTemplate;
+    private final String noteTemplate;
 
-    public NbnLinkCreator(String baseUrl, String marker, String descriptionTemplate) {
+    public NbnLinkCreator(String baseUrl, String noteTemplate) {
         this.baseUrl = baseUrl;
-        this.marker = marker;
-        this.descriptionTemplate = descriptionTemplate;
+        this.noteTemplate = noteTemplate;
     }
 
     public String create(String nbn) {
         String href = baseUrl + nbn;
-        String link = String.format("<a href=\"%s\">%s</a>", href, nbn);
-        return String.format(descriptionTemplate + marker, link);
+        return String.format(noteTemplate, href);
     }
 
-    public String getMarker() {
-        return marker;
-    }
 }

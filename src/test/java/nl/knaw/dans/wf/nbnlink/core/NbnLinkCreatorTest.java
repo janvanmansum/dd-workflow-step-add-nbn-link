@@ -25,15 +25,13 @@ public class NbnLinkCreatorTest {
     public void createsLinkFromValidInput() throws Exception {
         final String baseUrl = "http://www.persistent-identifier.nl?identifier=";
         final String nbn = "urn:nbn:nl:ui:13-blah-blah";
-        final String marker = "<input type=\"hidden\" value=\"NBN\"></input>";
 
         NbnLinkCreator creator = new NbnLinkCreator(
             baseUrl,
-            marker,
-            "A copy of this dataset is stored in EASY, the DANS CTS certified repository, at %s");
+            "A copy of this dataset is stored in EASY, the DANS CTS certified repository, at %s, you see");
 
-        String description = creator.create(nbn);
-        assertEquals("A copy of this dataset is stored in EASY, the DANS CTS certified repository, at <a href=\"" + baseUrl + nbn + "\">" + nbn + "</a>" + marker, description);
+        String note = creator.create(nbn);
+        assertEquals("A copy of this dataset is stored in EASY, the DANS CTS certified repository, at " + baseUrl + nbn + ", you see", note);
     }
 
 }

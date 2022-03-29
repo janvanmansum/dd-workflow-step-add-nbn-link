@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotEmpty;
 
 // TODO: candidate for dans-dataverse-client-lib?
+
 /**
  * The message received from Dataverse that invokes an external workflow step.
  */
@@ -43,13 +44,18 @@ public class StepInvocation {
 
     @JsonCreator
     public StepInvocation(@JsonProperty("invocationId") String invocationId, @JsonProperty("globalId") String globalId, @JsonProperty("datasetId") String datasetId,
-                          @JsonProperty("majorVersion") String majorVersion, @JsonProperty("minorVersion") String minorVersion) {
-        this.invocationId = invocationId; this.globalId = globalId; this.datasetId = datasetId; this.majorVersion = majorVersion; this.minorVersion = minorVersion;
+        @JsonProperty("majorVersion") String majorVersion, @JsonProperty("minorVersion") String minorVersion) {
+        this.invocationId = invocationId;
+        this.globalId = globalId;
+        this.datasetId = datasetId;
+        this.majorVersion = majorVersion;
+        this.minorVersion = minorVersion;
     }
 
     @Override
     public String toString() {
-        return "InvocationMessage{" + "invocationId='" + invocationId + '\'' + ", globalId='" + globalId + '\'' + ", datasetId='" + datasetId + '\'' + ", majorVersion='" + majorVersion + '\''
+        return "InvocationMessage{" + "invocationId='" + invocationId + '\'' + ", globalId='" + globalId + '\'' + ", datasetId='" + datasetId + '\'' + ", majorVersion='"
+            + majorVersion + '\''
             + ", minorVersion='" + minorVersion + '\'' + '}';
     }
 

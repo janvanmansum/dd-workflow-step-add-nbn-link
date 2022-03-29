@@ -35,7 +35,9 @@ public class Resumer {
     enum Status {
         Success,
         Failure
-    };
+    }
+
+    ;
 
     private final DataverseClient dataverseClient;
     private final RetryPolicy retryPolicy;
@@ -53,6 +55,7 @@ public class Resumer {
 
     public void executeResume(String invocationId, Status status, String reason, String message) {
         resumeExecutor.execute(new Runnable() {
+
             @Override
             public void run() {
                 log.trace("run");
@@ -67,7 +70,8 @@ public class Resumer {
                     log.warn("Resume failed. Tried {} of {} times", i + 1, retryPolicy.getMaxTries());
                     try {
                         sleep(retryPolicy.getTimeBetweenTries().toMilliseconds());
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         log.warn("Sleep got interrupted", e);
                     }
                 }
@@ -78,10 +82,13 @@ public class Resumer {
                 try {
                     dataverseClient.workflows().resume(invocationId, new ResumeMessage(status.name(), reason, message));
                     return true;
-                } catch (DataverseException e) {
-                    if (e.getStatus() == HttpStatus.SC_NOT_FOUND) return false;
+                }
+                catch (DataverseException e) {
+                    if (e.getStatus() == HttpStatus.SC_NOT_FOUND)
+                        return false;
                     throw new IllegalStateException("Failed to call resume for invocation " + invocationId, e);
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new IllegalStateException("Failed to call resume for invocation " + invocationId, e);
                 }
             }

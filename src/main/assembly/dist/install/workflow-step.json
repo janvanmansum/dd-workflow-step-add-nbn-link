@@ -1,13 +1,13 @@
 {
-  "provider":":internal",
-  "stepType":"http/authExt",
+  "provider": ":internal",
+  "stepType": "http/authExt",
   "parameters": {
-    "url":"http://localhost:20220/invoke",
-    "method":"POST",
-    "contentType":"application/json",
-    "body":"{\"invocationId\": \"${invocationId}\",\"globalId\": \"${dataset.globalId}\",\"datasetId\": \"${dataset.id}\", \"majorVersion\": \"${majorVersion}\", \"minorVersion\": \"${minorVersion}\" }",
-    "expectedResponse":".*",
+    "url": "http://localhost:20220/invoke",
+    "method": "POST",
+    "contentType": "application/json",
+    "body": "{\"invocationId\": \"${invocationId}\",\"globalId\": \"${dataset.globalId}\",\"datasetId\": \"${dataset.id}\", \"majorVersion\": \"${majorVersion}\", \"minorVersion\": \"${minorVersion}\" }",
+    "expectedResponse": ".*",
     "rollbackUrl": "http://localhost:20220/rollback",
-    "rollbackMethod":"POST"
+    "rollbackMethod": "POST"
   }
 }

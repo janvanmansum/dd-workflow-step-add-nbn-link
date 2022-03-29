@@ -19,7 +19,6 @@ package nl.knaw.dans.wf.nbnlink;
 import io.dropwizard.Configuration;
 import nl.knaw.dans.lib.util.DataverseClientFactory;
 import nl.knaw.dans.lib.util.ExecutorServiceFactory;
-import nl.knaw.dans.wf.nbnlink.core.NbnLinkCreator;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

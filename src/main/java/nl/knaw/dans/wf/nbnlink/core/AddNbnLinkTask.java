@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.wf.nbnlink.core;
 
-import nl.knaw.dans.lib.dataverse.CompoundFieldBuilder;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
@@ -62,23 +61,14 @@ public class AddNbnLinkTask implements Runnable {
             DatasetApi datasetApi = dataverseClient.dataset(stepInvocation.getGlobalId(), stepInvocation.getInvocationId());
             DataverseResponse<DatasetVersion> draft = getDraftVersion(datasetApi);
 
-            /*
-             * Even though it seems Dataverse will not add multiple descriptions that are exactly equal, we check if the NBN link
-             * is already present. If so, we take the cautious road and skip adding it.
-             */
-            if (new NbnLinkFinder(draft.getEnvelopeAsString(), nbnLinkCreator.getMarker()).isNbnLinkAdded()) {
-                log.debug("NBN link already present, skipping");
+            MetadataBlock vaultMetadata = getVaultMetadata(draft);
+            if (vaultMetadata == null) {
+                throw new IllegalStateException("No vault metadata set in dataset" + stepInvocation.getGlobalId());
             }
-            else {
-                MetadataBlock vaultMetadata = getVaultMetadata(draft);
-                if (vaultMetadata == null) {
-                    throw new IllegalStateException("No vault metadata set in dataset" + stepInvocation.getGlobalId());
-                }
-                String nbn = getNbn(vaultMetadata);
-                log.debug("Found nbn = {}", nbn);
-                FieldList fieldList = createNbnLinkDescription(nbn);
-                datasetApi.editMetadata(fieldList, false);
-            }
+            String nbn = getNbn(vaultMetadata);
+            log.debug("Found nbn = {}", nbn);
+            FieldList fieldList = createNbnLinkNote(nbn);
+            datasetApi.editMetadata(fieldList, true); // Notes cannot be added for other things than the NBN-link, so we can overwrite any existing value without worries.
             resumer.executeResume(stepInvocation.getInvocationId(), Resumer.Status.Success);
             log.debug("Scheduled resume of invocation {}", stepInvocation.getInvocationId());
         }
@@ -120,12 +110,9 @@ public class AddNbnLinkTask implements Runnable {
         return nbns.get(0);
     }
 
-    private FieldList createNbnLinkDescription(String nbn) {
+    private FieldList createNbnLinkNote(String nbn) {
         FieldList fieldList = new FieldList();
-        fieldList.add(new CompoundFieldBuilder("dsDescription", true)
-            .addSubfield("dsDescriptionValue", nbnLinkCreator.create(nbn))
-            .addSubfield("dsDescriptionDate", "")
-            .build());
+        fieldList.add(new PrimitiveSingleValueField("notesText", nbnLinkCreator.create(nbn)));
         return fieldList;
     }
 
